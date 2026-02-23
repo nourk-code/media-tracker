@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="300" viewBox="0 0 200 300">
+  <rect width="200" height="300" fill="#1a1a2e"/>
+  <text x="100" y="155" text-anchor="middle" fill="#2d2d4a" font-family="system-ui" font-size="14">No Poster</text>
+</svg>
