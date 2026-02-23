@@ -66,13 +66,21 @@ Query: "${query}"
 
 Valid statuses: "owned", "wishlist", "currently_watching", "completed"
 Valid media types: "movie", "tv"
-Common genres: Action, Comedy, Drama, Horror, Sci-Fi, Thriller, Romance, Animation, Documentary, Fantasy, Crime
+TMDB genre names (use these exact strings): Action, Adventure, Animation, Comedy, Crime, Documentary, Drama, Family, Fantasy, History, Horror, Music, Mystery, Romance, Science Fiction, Thriller, War, Western, Action & Adventure, Kids, News, Reality, Sci-Fi & Fantasy, Soap, Talk, War & Politics
+
+Rules:
+- "unwatched" means status = "wishlist"
+- "watching" means status = "currently_watching"
+- "finished" or "watched" means status = "completed"
+- "movies" means media_type = "movie", "shows" or "series" means media_type = "tv"
+- Use TMDB genre names from the list above (e.g. "Science Fiction" not "Sci-Fi")
+- If no filter applies for a field, set it to null or []
 
 Respond with ONLY valid JSON. No markdown, no explanation.
 Format: {
   "status": "<status or null>",
   "media_type": "<movie|tv or null>",
-  "genres": ["<genre>" or empty array],
+  "genres": ["<TMDB genre name>" or empty array],
   "min_year": <number or null>,
   "max_year": <number or null>,
   "keyword": "<any remaining search term or null>"

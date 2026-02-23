@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCollection, updateProfile, getProfile } from "@/lib/supabase/queries";
-import { generateText } from "@/lib/gemini/client";
+import {
+  generateText,
+  isRateLimitError,
+  getRetryAfterSeconds,
+} from "@/lib/gemini/client";
 import { collectionDNAPrompt } from "@/lib/gemini/prompts";
 import { checkRateLimit } from "@/lib/gemini/ratelimit";
 
@@ -102,6 +106,13 @@ export async function POST() {
     return NextResponse.json({ dna: dna.trim(), cached: false });
   } catch (error) {
     console.error("AI DNA error:", error);
+    if (isRateLimitError(error)) {
+      const retryAfter = getRetryAfterSeconds(error) ?? 60;
+      return NextResponse.json(
+        { error: `AI rate limit reached. Try again in ${retryAfter} seconds.` },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
     return NextResponse.json({ error: "AI request failed" }, { status: 500 });
   }
 }

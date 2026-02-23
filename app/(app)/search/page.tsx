@@ -16,11 +16,22 @@ import { MediaGrid } from "@/components/media/MediaGrid";
 import type { TMDBSearchResult, TMDBMovie, TMDBTVShow } from "@/lib/tmdb/types";
 import type { CollectionItem } from "@/lib/types/collection";
 
+interface AppliedFilters {
+  status: string | null;
+  media_type: string | null;
+  genres: string[];
+  min_year: number | null;
+  max_year: number | null;
+  keyword: string | null;
+}
+
 export default function SearchPage() {
   const [mode, setMode] = useState<"add" | "nl">("add");
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<TMDBSearchResult[]>([]);
   const [nlResults, setNlResults] = useState<CollectionItem[]>([]);
+  const [nlFilters, setNlFilters] = useState<AppliedFilters | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState<Set<number>>(new Set());
   const addItem = useAddItem();
@@ -41,6 +52,7 @@ export default function SearchPage() {
   async function handleNLSearch() {
     if (query.trim().length < 2) return;
     setLoading(true);
+    setHasSearched(false);
     try {
       const res = await fetch("/api/ai/search", {
         method: "POST",
@@ -49,6 +61,8 @@ export default function SearchPage() {
       });
       const data = await res.json();
       setNlResults(data.results ?? []);
+      setNlFilters(data.filters ?? null);
+      setHasSearched(true);
     } finally {
       setLoading(false);
     }
@@ -78,7 +92,7 @@ export default function SearchPage() {
     <div className="p-8 max-w-3xl">
       <h1 className="text-2xl font-bold text-white mb-6">Search</h1>
 
-      <Tabs value={mode} onValueChange={(v) => setMode(v as "add" | "nl")}>
+      <Tabs value={mode} onValueChange={(v) => { setMode(v as "add" | "nl"); setNlResults([]); setNlFilters(null); setHasSearched(false); setResults([]); }}>
         <TabsList className="bg-white/5 border border-white/10 mb-6">
           <TabsTrigger
             value="add"
@@ -201,19 +215,57 @@ export default function SearchPage() {
       )}
 
       {/* NL Results */}
-      {!loading && mode === "nl" && nlResults.length > 0 && (
+      {!loading && mode === "nl" && hasSearched && (
         <div>
-          <p className="text-gray-500 text-sm mb-4">
-            {nlResults.length} items matched in your collection
-          </p>
-          <MediaGrid items={nlResults} />
-        </div>
-      )}
+          {/* Applied filters summary */}
+          {nlFilters && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {nlFilters.status && (
+                <span className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  Status: {nlFilters.status.replace("_", " ")}
+                </span>
+              )}
+              {nlFilters.media_type && (
+                <span className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  Type: {nlFilters.media_type === "tv" ? "TV Show" : "Movie"}
+                </span>
+              )}
+              {nlFilters.genres.map((g) => (
+                <span key={g} className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  {g}
+                </span>
+              ))}
+              {nlFilters.min_year && (
+                <span className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  From {nlFilters.min_year}
+                </span>
+              )}
+              {nlFilters.max_year && (
+                <span className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  Until {nlFilters.max_year}
+                </span>
+              )}
+              {nlFilters.keyword && (
+                <span className="text-xs px-2 py-1 rounded-full bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+                  &ldquo;{nlFilters.keyword}&rdquo;
+                </span>
+              )}
+            </div>
+          )}
 
-      {!loading && mode === "nl" && nlResults.length === 0 && query && (
-        <p className="text-gray-500 text-center py-12">
-          No items in your collection matched that search.
-        </p>
+          {nlResults.length > 0 ? (
+            <>
+              <p className="text-gray-500 text-sm mb-4">
+                {nlResults.length} item{nlResults.length !== 1 ? "s" : ""} matched in your collection
+              </p>
+              <MediaGrid items={nlResults} />
+            </>
+          ) : (
+            <p className="text-gray-500 text-center py-12">
+              No items in your collection matched that search. Try rephrasing or broadening your query.
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

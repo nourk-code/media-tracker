@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCollection } from "@/lib/supabase/queries";
-import { generateText, parseGeminiJSON } from "@/lib/gemini/client";
+import {
+  generateText,
+  parseGeminiJSON,
+  isRateLimitError,
+  getRetryAfterSeconds,
+} from "@/lib/gemini/client";
 import { naturalLanguageSearchPrompt } from "@/lib/gemini/prompts";
 import { checkRateLimit } from "@/lib/gemini/ratelimit";
 import type { MediaStatus, MediaType } from "@/lib/types/collection";
@@ -52,7 +57,14 @@ export async function POST(request: Request) {
   try {
     const raw = await generateText(naturalLanguageSearchPrompt(query));
     filters = parseGeminiJSON<SearchFilter>(raw);
-  } catch {
+  } catch (error) {
+    if (isRateLimitError(error)) {
+      const retryAfter = getRetryAfterSeconds(error) ?? 60;
+      return NextResponse.json(
+        { error: `AI rate limit reached. Try again in ${retryAfter} seconds.` },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
     // Fall back to keyword search if Gemini fails or returns bad JSON
     filters.keyword = query;
   }
@@ -66,9 +78,13 @@ export async function POST(request: Request) {
       return false;
     if (
       filters.genres.length > 0 &&
-      !filters.genres.some((g) =>
-        item.genres.map((ig) => ig.toLowerCase()).includes(g.toLowerCase())
-      )
+      !filters.genres.some((filterGenre) => {
+        const fl = filterGenre.toLowerCase().replace(/[^a-z0-9]/g, "");
+        return item.genres.some((itemGenre) => {
+          const il = itemGenre.toLowerCase().replace(/[^a-z0-9]/g, "");
+          return il.includes(fl) || fl.includes(il);
+        });
+      })
     )
       return false;
     if (filters.min_year && item.release_year && item.release_year < filters.min_year)

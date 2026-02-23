@@ -2,11 +2,23 @@
 
 export const dynamic = "force-dynamic";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Film } from "lucide-react";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+
   async function signInWithGoogle() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -15,6 +27,40 @@ export default function LoginPage() {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+  }
+
+  async function handleEmailAuth(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setMessage(null);
+    setLoading(true);
+
+    const supabase = createClient();
+
+    if (mode === "signin") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError(error.message);
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (error) {
+        setError(error.message);
+      } else {
+        setMessage("Check your email for a confirmation link.");
+      }
+    }
+
+    setLoading(false);
   }
 
   return (
@@ -33,12 +79,13 @@ export default function LoginPage() {
         {/* Card */}
         <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
           <h1 className="text-2xl font-semibold text-white mb-2 text-center">
-            Welcome back
+            {mode === "signin" ? "Welcome back" : "Create account"}
           </h1>
           <p className="text-gray-400 text-center mb-8 text-sm">
             Track your movies, discover what to watch next.
           </p>
 
+          {/* Google SSO */}
           <Button
             onClick={signInWithGoogle}
             className="w-full bg-white text-gray-900 hover:bg-gray-100 font-medium h-12 text-base gap-3"
@@ -64,7 +111,71 @@ export default function LoginPage() {
             Continue with Google
           </Button>
 
-          <p className="text-center text-gray-500 text-xs mt-6">
+          {/* Divider */}
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-gray-500 text-xs">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
+          {/* Email/Password form */}
+          <form onSubmit={handleEmailAuth} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-gray-300">Email</Label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-600"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-gray-300">Password</Label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-600"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-400 text-sm">{error}</p>
+            )}
+            {message && (
+              <p className="text-green-400 text-sm">{message}</p>
+            )}
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-500 text-white h-12 text-base font-medium"
+            >
+              {loading
+                ? "Please wait..."
+                : mode === "signin"
+                ? "Sign In"
+                : "Create Account"}
+            </Button>
+          </form>
+
+          {/* Toggle mode */}
+          <p className="text-center text-gray-500 text-sm mt-5">
+            {mode === "signin" ? "Don't have an account?" : "Already have an account?"}{" "}
+            <button
+              onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setError(null); setMessage(null); }}
+              className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+            >
+              {mode === "signin" ? "Sign up" : "Sign in"}
+            </button>
+          </p>
+
+          <p className="text-center text-gray-500 text-xs mt-4">
             By signing in, you agree to our terms and privacy policy.
           </p>
         </div>

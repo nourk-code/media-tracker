@@ -35,8 +35,9 @@ export function EditMediaDialog({
   onOpenChange,
 }: EditMediaDialogProps) {
   const [status, setStatus] = useState<MediaStatus>(item.status);
+  const NO_RATING_VALUE = "__none__";
   const [rating, setRating] = useState<string>(
-    item.user_rating?.toString() ?? ""
+    item.user_rating != null ? String(item.user_rating) : NO_RATING_VALUE
   );
   const [notes, setNotes] = useState(item.user_notes ?? "");
   const patchItem = usePatchItem();
@@ -46,7 +47,8 @@ export function EditMediaDialog({
       id: item.id,
       update: {
         status,
-        user_rating: rating ? parseInt(rating) : null,
+        user_rating:
+        rating && rating !== NO_RATING_VALUE ? parseInt(rating) : null,
         user_notes: notes || null,
         date_completed:
           status === "completed" && !item.date_completed
@@ -95,7 +97,9 @@ export function EditMediaDialog({
                 <SelectValue placeholder="No rating" />
               </SelectTrigger>
               <SelectContent className="bg-[#1a1a2e] border-white/10">
-                <SelectItem value="" className="text-white">No rating</SelectItem>
+                <SelectItem value={NO_RATING_VALUE} className="text-white">
+                  No rating
+                </SelectItem>
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                   <SelectItem key={n} value={String(n)} className="text-white">
                     {n} / 10

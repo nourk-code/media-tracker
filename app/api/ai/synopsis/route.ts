@@ -4,7 +4,11 @@ import {
   getCollectionItem,
   updateCollectionItem,
 } from "@/lib/supabase/queries";
-import { generateText } from "@/lib/gemini/client";
+import {
+  generateText,
+  isRateLimitError,
+  getRetryAfterSeconds,
+} from "@/lib/gemini/client";
 import { synopsisPrompt } from "@/lib/gemini/prompts";
 import { checkRateLimit } from "@/lib/gemini/ratelimit";
 
@@ -57,12 +61,23 @@ export async function POST(request: Request) {
 
     const cleaned = synopsis.trim();
 
-    // Cache in DB
-    await updateCollectionItem(supabase, itemId, { ai_synopsis: cleaned });
+    // Cache in DB (best-effort — don't fail the request if this errors)
+    try {
+      await updateCollectionItem(supabase, itemId, { ai_synopsis: cleaned });
+    } catch (dbErr) {
+      console.warn("synopsis cache write failed:", dbErr);
+    }
 
     return NextResponse.json({ synopsis: cleaned, cached: false });
   } catch (error) {
     console.error("AI synopsis error:", error);
+    if (isRateLimitError(error)) {
+      const retryAfter = getRetryAfterSeconds(error) ?? 60;
+      return NextResponse.json(
+        { error: `AI rate limit reached. Try again in ${retryAfter} seconds.` },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
     return NextResponse.json({ error: "AI request failed" }, { status: 500 });
   }
 }

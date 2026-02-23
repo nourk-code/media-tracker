@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCollection } from "@/lib/supabase/queries";
-import { generateText, parseGeminiJSON } from "@/lib/gemini/client";
+import {
+  generateText,
+  parseGeminiJSON,
+  isRateLimitError,
+  getRetryAfterSeconds,
+} from "@/lib/gemini/client";
 import { moodPickerPrompt } from "@/lib/gemini/prompts";
 import { checkRateLimit } from "@/lib/gemini/ratelimit";
 import type { CollectionItem } from "@/lib/types/collection";
@@ -69,6 +74,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ picks: results });
   } catch (error) {
     console.error("AI mood error:", error);
+    if (isRateLimitError(error)) {
+      const retryAfter = getRetryAfterSeconds(error) ?? 60;
+      return NextResponse.json(
+        { error: `AI rate limit reached. Try again in ${retryAfter} seconds.` },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
     return NextResponse.json({ error: "AI request failed" }, { status: 500 });
   }
 }
