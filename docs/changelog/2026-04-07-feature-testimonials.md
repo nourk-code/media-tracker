@@ -2,12 +2,12 @@
 
 | Field       | Value              |
 |-------------|--------------------|
-| Date        | 2026-04-07 17:22:44       |
+| Date        | 2026-04-07 17:24:11       |
 | Branch      | `feature/testimonials`      |
 | Author      | nour-DCS          |
 | Change Type | feature     |
 
 ## Changed Files
 
-- `.github/workflows/publish-docs.yml`
-- `docs/changelog/2026-04-07-dev.md`
+- `app/page.tsx`
+- `docs/changelog/2026-04-07-feature-testimonials.md`
