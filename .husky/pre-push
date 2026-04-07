@@ -1,0 +1,59 @@
+#!/bin/sh
+
+(
+  # Get git info
+  BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "unknown")
+  AUTHOR=$(git config user.name 2>/dev/null || echo "unknown")
+  DATE=$(date +%Y-%m-%d)
+  TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
+
+  # Determine change type from branch prefix
+  case "$BRANCH" in
+    feature/*) CHANGE_TYPE="feature" ;;
+    fix/*|bugfix/*|hotfix/*) CHANGE_TYPE="fix" ;;
+    *) CHANGE_TYPE="other" ;;
+  esac
+
+  # Get list of changed files compared to remote (or all tracked files if no remote ref)
+  REMOTE_BRANCH="origin/$BRANCH"
+  if git rev-parse "$REMOTE_BRANCH" >/dev/null 2>&1; then
+    CHANGED_FILES=$(git diff --name-only "$REMOTE_BRANCH"..HEAD 2>/dev/null)
+  else
+    CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --cached --name-only)
+  fi
+
+  # Sanitize branch name for filename
+  SAFE_BRANCH=$(echo "$BRANCH" | sed 's/\//-/g')
+
+  # Create docs/changelog directory
+  mkdir -p docs/changelog
+
+  OUTFILE="docs/changelog/${DATE}-${SAFE_BRANCH}.md"
+
+  # Write markdown file
+  cat > "$OUTFILE" << EOF
+# Changelog: ${BRANCH}
+
+| Field       | Value              |
+|-------------|--------------------|
+| Date        | ${TIMESTAMP}       |
+| Branch      | \`${BRANCH}\`      |
+| Author      | ${AUTHOR}          |
+| Change Type | ${CHANGE_TYPE}     |
+
+## Changed Files
+
+$(echo "$CHANGED_FILES" | while IFS= read -r f; do [ -n "$f" ] && echo "- \`$f\`"; done)
+EOF
+
+  # Stage the generated file so it's included in the push
+  git add "$OUTFILE"
+
+  # If the file is staged, amend the last commit silently to include it
+  if ! git diff --cached --quiet; then
+    git commit --no-edit --amend --no-gpg-sign -q
+  fi
+
+) 2>/dev/null || true
+
+exit 0

@@ -1,0 +1,30 @@
+name: Publish Docs to Confluence
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  publish:
+    # Only run on actual merges, and never on bot commits
+    if: |
+      github.event.pull_request.merged == true &&
+      github.actor != 'github-actions[bot]' &&
+      github.actor != 'dependabot[bot]'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Publish docs to Confluence
+        uses: markdown-confluence/publish-action@v5
+        with:
+          confluenceBaseUrl: ${{ secrets.CONFLUENCE_BASE_URL }}
+          confluenceParentId: ${{ secrets.CONFLUENCE_PARENT_ID }}
+          atlassianUserName: ${{ secrets.ATLASSIAN_USERNAME }}
+          atlassianApiToken: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          contentRoot: docs
