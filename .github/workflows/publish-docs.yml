@@ -37,6 +37,8 @@ jobs:
 
       - name: Publish docs to Confluence
         uses: markdown-confluence/publish-action@v5
+        with:
+          configFile: .markdown-confluence.json
         env:
           CONFLUENCE_SPACE_KEY: "~7120208f6e1034850f4e18b02531512b60dc5b"
           CONFLUENCE_BASE_URL: "https://nourfk15.atlassian.net/wiki"
