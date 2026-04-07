@@ -32,6 +32,10 @@
 
   # Write markdown file
   cat > "$OUTFILE" << EOF
+---
+connie-publish: true
+---
+
 # Changelog: ${BRANCH}
 
 | Field       | Value              |
