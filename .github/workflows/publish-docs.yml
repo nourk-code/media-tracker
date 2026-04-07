@@ -19,29 +19,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Write Confluence config
-        run: |
-          cat > .markdown-confluence.json << 'EOF'
-          {
-            "confluenceBaseUrl": "https://nourfk15.atlassian.net/wiki",
-            "atlassianUserName": "${{ secrets.ATLASSIAN_USERNAME }}",
-            "atlassianApiToken": "${{ secrets.ATLASSIAN_API_TOKEN }}",
-            "confluenceParentId": "655361",
-            "confluenceSpaceKey": "~7120208f6e1034850f4e18b02531512b60dc5b",
-            "contentRoot": "docs"
-          }
-          EOF
-
-      - name: Debug - show config file
-        run: cat .markdown-confluence.json
-
       - name: Publish docs to Confluence
         uses: markdown-confluence/publish-action@v5
         with:
-          configFile: .markdown-confluence.json
-        env:
-          CONFLUENCE_SPACE_KEY: "~7120208f6e1034850f4e18b02531512b60dc5b"
-          CONFLUENCE_BASE_URL: "https://nourfk15.atlassian.net/wiki"
-          CONFLUENCE_PARENT_ID: "655361"
-          ATLASSIAN_USERNAME: ${{ secrets.ATLASSIAN_USERNAME }}
-          ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          confluenceBaseUrl: "https://nourfk15.atlassian.net/wiki"
+          confluenceParentId: "655361"
+          atlassianUserName: ${{ secrets.ATLASSIAN_USERNAME }}
+          atlassianApiToken: ${{ secrets.ATLASSIAN_API_TOKEN }}
+          contentRoot: docs
+          folderToPublish: docs
