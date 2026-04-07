@@ -74,6 +74,22 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* Stats */}
+      <div className="max-w-4xl mx-auto px-8 pb-16">
+        <div className="grid grid-cols-3 gap-6 text-center">
+          {[
+            { value: "10K+", label: "Movies tracked" },
+            { value: "500+", label: "Active users" },
+            { value: "50K+", label: "Reviews written" },
+          ].map(({ value, label }) => (
+            <div key={label} className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <div className="text-3xl font-bold text-indigo-400 mb-1">{value}</div>
+              <div className="text-gray-400 text-sm">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Search teaser */}
       <div className="max-w-2xl mx-auto px-8 pb-32 text-center">
         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex items-center gap-3">

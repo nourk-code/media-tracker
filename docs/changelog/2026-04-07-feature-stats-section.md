@@ -1,11 +1,11 @@
-# Changelog: dev
+# Changelog: feature/stats-section
 
 | Field       | Value              |
 |-------------|--------------------|
-| Date        | 2026-04-07 17:07:01       |
-| Branch      | `dev`      |
+| Date        | 2026-04-07 17:14:45       |
+| Branch      | `feature/stats-section`      |
 | Author      | nour-DCS          |
-| Change Type | other     |
+| Change Type | feature     |
 
 ## Changed Files
 
