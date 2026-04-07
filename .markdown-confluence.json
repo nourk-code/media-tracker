@@ -1,7 +1,8 @@
 {
-  "confluenceBaseUrl": "${CONFLUENCE_BASE_URL}",
+  "confluenceBaseUrl": "https://nourfk15.atlassian.net/wiki",
   "atlassianUserName": "${ATLASSIAN_USERNAME}",
   "atlassianApiToken": "${ATLASSIAN_API_TOKEN}",
-  "confluenceParentId": "${CONFLUENCE_PARENT_ID}",
+  "confluenceParentId": "655361",
+  "confluenceSpaceKey": "~7120208f6e1034850f4e18b02531512b60dc5b",
   "contentRoot": "docs"
 }
