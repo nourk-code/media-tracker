@@ -34,3 +34,5 @@ jobs:
 
       - name: Publish docs to Confluence
         uses: markdown-confluence/publish-action@v5
+        with:
+          configFile: .markdown-confluence.json
