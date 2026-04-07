@@ -27,10 +27,13 @@ jobs:
             "atlassianUserName": "${{ secrets.ATLASSIAN_USERNAME }}",
             "atlassianApiToken": "${{ secrets.ATLASSIAN_API_TOKEN }}",
             "confluenceParentId": "655361",
-            "spaceKey": "~7120208f6e1034850f4e18b02531512b60dc5b",
+            "confluenceSpaceKey": "~7120208f6e1034850f4e18b02531512b60dc5b",
             "contentRoot": "docs"
           }
           EOF
+
+      - name: Debug - show config file
+        run: cat .markdown-confluence.json
 
       - name: Publish docs to Confluence
         uses: markdown-confluence/publish-action@v5
@@ -40,5 +43,3 @@ jobs:
           CONFLUENCE_PARENT_ID: "655361"
           ATLASSIAN_USERNAME: ${{ secrets.ATLASSIAN_USERNAME }}
           ATLASSIAN_API_TOKEN: ${{ secrets.ATLASSIAN_API_TOKEN }}
-        with:
-          configFile: .markdown-confluence.json
