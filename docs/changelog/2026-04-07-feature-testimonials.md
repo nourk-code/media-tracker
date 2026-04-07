@@ -1,11 +1,11 @@
-# Changelog: dev
+# Changelog: feature/testimonials
 
 | Field       | Value              |
 |-------------|--------------------|
-| Date        | 2026-04-07 17:21:18       |
-| Branch      | `dev`      |
+| Date        | 2026-04-07 17:22:44       |
+| Branch      | `feature/testimonials`      |
 | Author      | nour-DCS          |
-| Change Type | other     |
+| Change Type | feature     |
 
 ## Changed Files
 
