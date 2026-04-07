@@ -8,7 +8,6 @@ on:
 
 jobs:
   publish:
-    # Only run on actual merges, and never on bot commits
     if: |
       github.event.pull_request.merged == true &&
       github.actor != 'github-actions[bot]' &&
@@ -20,12 +19,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Write Confluence config
+        run: |
+          cat > .markdown-confluence.json << 'EOF'
+          {
+            "confluenceBaseUrl": "https://nourfk15.atlassian.net/wiki",
+            "atlassianUserName": "${{ secrets.ATLASSIAN_USERNAME }}",
+            "atlassianApiToken": "${{ secrets.ATLASSIAN_API_TOKEN }}",
+            "confluenceParentId": "655361",
+            "spaceKey": "~7120208f6e1034850f4e18b02531512b60dc5b",
+            "contentRoot": "docs"
+          }
+          EOF
+
       - name: Publish docs to Confluence
         uses: markdown-confluence/publish-action@v5
-        with:
-          confluenceBaseUrl: ${{ secrets.CONFLUENCE_BASE_URL }}
-          confluenceParentId: ${{ secrets.CONFLUENCE_PARENT_ID }}
-          confluenceSpaceKey: ${{ secrets.CONFLUENCE_SPACE_KEY }}
-          atlassianUserName: ${{ secrets.ATLASSIAN_USERNAME }}
-          atlassianApiToken: ${{ secrets.ATLASSIAN_API_TOKEN }}
-          contentRoot: docs
