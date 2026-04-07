@@ -1,0 +1,7 @@
+{
+  "confluenceBaseUrl": "${CONFLUENCE_BASE_URL}",
+  "atlassianUserName": "${ATLASSIAN_USERNAME}",
+  "atlassianApiToken": "${ATLASSIAN_API_TOKEN}",
+  "confluenceParentId": "${CONFLUENCE_PARENT_ID}",
+  "contentRoot": "docs"
+}
