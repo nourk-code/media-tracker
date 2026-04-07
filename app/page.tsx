@@ -102,6 +102,10 @@ export default function LandingPage() {
           Natural language search powered by Gemini AI
         </p>
       </div>
+      {/* Footer */}
+      <footer className="border-t border-white/5 px-8 py-6 text-center text-gray-600 text-xs">
+        © {new Date().getFullYear()} MediaVault. All rights reserved.
+      </footer>
     </div>
   );
 }
