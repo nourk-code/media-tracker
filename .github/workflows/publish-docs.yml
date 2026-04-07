@@ -25,6 +25,7 @@ jobs:
         with:
           confluenceBaseUrl: ${{ secrets.CONFLUENCE_BASE_URL }}
           confluenceParentId: ${{ secrets.CONFLUENCE_PARENT_ID }}
-atlassianUserName: ${{ secrets.ATLASSIAN_USERNAME }}
+          confluenceSpaceKey: ${{ secrets.CONFLUENCE_SPACE_KEY }}
+          atlassianUserName: ${{ secrets.ATLASSIAN_USERNAME }}
           atlassianApiToken: ${{ secrets.ATLASSIAN_API_TOKEN }}
           contentRoot: docs

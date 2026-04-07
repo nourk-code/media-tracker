@@ -102,6 +102,23 @@ export default function LandingPage() {
           Natural language search powered by Gemini AI
         </p>
       </div>
+      {/* Testimonials */}
+      <div className="max-w-5xl mx-auto px-8 pb-20">
+        <h2 className="text-2xl font-bold text-center text-white mb-10">What users are saying</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { name: "Alex M.", text: "Finally an app that keeps all my watchlists in one place. Love the AI recommendations." },
+            { name: "Sara K.", text: "The mood-based picks are scary accurate. It recommended exactly what I needed on a rainy day." },
+            { name: "James T.", text: "Clean UI, fast, and the public profiles make it easy to share my taste with friends." },
+          ].map(({ name, text }) => (
+            <div key={name} className="bg-white/5 border border-white/10 rounded-2xl p-6">
+              <p className="text-gray-300 text-sm leading-relaxed mb-4">&ldquo;{text}&rdquo;</p>
+              <span className="text-indigo-400 text-sm font-medium">{name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="border-t border-white/5 px-8 py-6 text-center text-gray-600 text-xs">
         © {new Date().getFullYear()} MediaVault. All rights reserved.
