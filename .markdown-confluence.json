@@ -1,5 +1,5 @@
 {
-  "confluenceBaseUrl": "https://nourfk15.atlassian.net/wiki",
+  "confluenceBaseUrl": "https://nourfk15.atlassian.net",
   "atlassianUserName": "${ATLASSIAN_USERNAME}",
   "atlassianApiToken": "${ATLASSIAN_API_TOKEN}",
   "confluenceParentId": "655361",

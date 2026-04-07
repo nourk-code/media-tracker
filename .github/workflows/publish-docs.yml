@@ -22,7 +22,7 @@ jobs:
       - name: Publish docs to Confluence
         uses: markdown-confluence/publish-action@v5
         with:
-          confluenceBaseUrl: "https://nourfk15.atlassian.net/wiki"
+          confluenceBaseUrl: "https://nourfk15.atlassian.net"
           confluenceParentId: "655361"
           atlassianUserName: ${{ secrets.ATLASSIAN_USERNAME }}
           atlassianApiToken: ${{ secrets.ATLASSIAN_API_TOKEN }}
