@@ -13,20 +13,21 @@ Branch `feature/faq-section` — change type: **feature**.
 
 ## Goal
 
+- added faq
 - feat: update changelog format with frontmatter and structured sections
 
 ## Scope
 
 Files affected in this push:
 
-- `.husky/pre-push`
-- `docs/changelog/2026-04-08-dev.md`
+- `app/page.tsx`
+- `docs/changelog/2026-04-08-feature-faq-section.md`
 
 ## Approach
 
 | Field       | Value              |
 |-------------|--------------------|
-| Date        | 2026-04-08 18:40:30       |
+| Date        | 2026-04-08 18:41:53       |
 | Branch      | `feature/faq-section`      |
 | Author      | nour-DCS          |
 | Change Type | feature     |

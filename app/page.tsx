@@ -1,6 +1,32 @@
+"use client";
+
 import Link from "next/link";
-import { Film, Sparkles, Users, Search } from "lucide-react";
+import { Film, Sparkles, Users, Search, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+
+const faqs = [
+  {
+    question: "Is MediaVault free to use?",
+    answer: "Yes, MediaVault is completely free. Create an account and start tracking your movies and TV shows instantly.",
+  },
+  {
+    question: "How does the AI recommendation work?",
+    answer: "You describe your mood or what you're in the mood for, and our Gemini-powered AI scans your collection and suggests the best match.",
+  },
+  {
+    question: "Can I share my collection with others?",
+    answer: "Absolutely. Every account has a public profile page where others can browse your watchlist, ratings, and reviews.",
+  },
+  {
+    question: "Where does the movie and show data come from?",
+    answer: "We pull metadata, posters, cast info, and ratings directly from The Movie Database (TMDB).",
+  },
+  {
+    question: "Can I track both movies and TV shows?",
+    answer: "Yes. You can log movies and full TV series, mark individual episodes as watched, and rate each separately.",
+  },
+];
 
 export default function LandingPage() {
   return (
@@ -119,9 +145,35 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* FAQ */}
+      <div className="max-w-3xl mx-auto px-8 pb-24">
+        <h2 className="text-2xl font-bold text-center text-white mb-10">Frequently asked questions</h2>
+        <div className="space-y-3">
+          {faqs.map(({ question, answer }) => {
+            const [open, setOpen] = useState(false);
+            return (
+              <div key={question} className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+                <button
+                  onClick={() => setOpen(!open)}
+                  className="w-full flex items-center justify-between px-6 py-4 text-left text-white font-medium hover:bg-white/5 transition-colors"
+                >
+                  <span>{question}</span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} />
+                </button>
+                {open && (
+                  <div className="px-6 pb-4 text-gray-400 text-sm leading-relaxed">
+                    {answer}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Footer */}
       <footer className="border-t border-white/5 px-8 py-6 text-center text-gray-600 text-xs">
-        © {new Date().getFullYear()} MediaVault. All rights reserved.
+        © {new Date().getFullYear()} MediaVault. All rights reserved. · Built with Next.js
       </footer>
     </div>
   );
