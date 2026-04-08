@@ -14,12 +14,14 @@
     *) CHANGE_TYPE="other" ;;
   esac
 
-  # Get list of changed files compared to remote (or all tracked files if no remote ref)
+  # Get list of changed files and commit messages compared to remote
   REMOTE_BRANCH="origin/$BRANCH"
   if git rev-parse "$REMOTE_BRANCH" >/dev/null 2>&1; then
     CHANGED_FILES=$(git diff --name-only "$REMOTE_BRANCH"..HEAD 2>/dev/null)
+    COMMIT_MESSAGES=$(git log "$REMOTE_BRANCH"..HEAD --pretty=format:"- %s" 2>/dev/null)
   else
     CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --cached --name-only)
+    COMMIT_MESSAGES=$(git log HEAD~1..HEAD --pretty=format:"- %s" 2>/dev/null || echo "- Initial commit")
   fi
 
   # Sanitize branch name for filename
@@ -44,6 +46,10 @@ connie-publish: true
 | Branch      | \`${BRANCH}\`      |
 | Author      | ${AUTHOR}          |
 | Change Type | ${CHANGE_TYPE}     |
+
+## Summary
+
+${COMMIT_MESSAGES}
 
 ## Changed Files
 
