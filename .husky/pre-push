@@ -7,21 +7,27 @@
   DATE=$(date +%Y-%m-%d)
   TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
-  # Determine change type from branch prefix
+  # Determine change type and status from branch prefix
   case "$BRANCH" in
-    feature/*) CHANGE_TYPE="feature" ;;
-    fix/*|bugfix/*|hotfix/*) CHANGE_TYPE="fix" ;;
-    *) CHANGE_TYPE="other" ;;
+    feature/*) CHANGE_TYPE="feature"; STATUS="InProgress" ;;
+    fix/*|bugfix/*|hotfix/*) CHANGE_TYPE="fix"; STATUS="Done" ;;
+    release/*) CHANGE_TYPE="release"; STATUS="Done" ;;
+    *) CHANGE_TYPE="other"; STATUS="InProgress" ;;
   esac
+
+  # Strip prefix from branch name for a readable title
+  BRANCH_TITLE=$(echo "$BRANCH" | sed 's|.*/||' | sed 's/-/ /g')
 
   # Get list of changed files and commit messages compared to remote
   REMOTE_BRANCH="origin/$BRANCH"
   if git rev-parse "$REMOTE_BRANCH" >/dev/null 2>&1; then
     CHANGED_FILES=$(git diff --name-only "$REMOTE_BRANCH"..HEAD 2>/dev/null)
     COMMIT_MESSAGES=$(git log "$REMOTE_BRANCH"..HEAD --pretty=format:"- %s" 2>/dev/null)
+    COMMIT_BODIES=$(git log "$REMOTE_BRANCH"..HEAD --pretty=format:"%b" 2>/dev/null)
   else
     CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD 2>/dev/null || git diff --cached --name-only)
     COMMIT_MESSAGES=$(git log HEAD~1..HEAD --pretty=format:"- %s" 2>/dev/null || echo "- Initial commit")
+    COMMIT_BODIES=$(git log HEAD~1..HEAD --pretty=format:"%b" 2>/dev/null)
   fi
 
   # Sanitize branch name for filename
@@ -36,9 +42,28 @@
   cat > "$OUTFILE" << EOF
 ---
 connie-publish: true
+date: ${DATE}
+status: ${STATUS}
+owners: [${AUTHOR}]
 ---
 
-# Changelog: ${BRANCH}
+## Context
+
+Branch \`${BRANCH}\` — change type: **${CHANGE_TYPE}**.
+
+${COMMIT_BODIES}
+
+## Goal
+
+${COMMIT_MESSAGES}
+
+## Scope
+
+Files affected in this push:
+
+$(echo "$CHANGED_FILES" | while IFS= read -r f; do [ -n "$f" ] && echo "- \`$f\`"; done)
+
+## Approach
 
 | Field       | Value              |
 |-------------|--------------------|
@@ -47,13 +72,14 @@ connie-publish: true
 | Author      | ${AUTHOR}          |
 | Change Type | ${CHANGE_TYPE}     |
 
-## Summary
+## Test plan
 
-${COMMIT_MESSAGES}
+- Verify changes on \`${BRANCH}\` before merging to master
+- Review affected files listed under Scope
 
-## Changed Files
+## Rollback plan
 
-$(echo "$CHANGED_FILES" | while IFS= read -r f; do [ -n "$f" ] && echo "- \`$f\`"; done)
+Revert the merge commit on master to undo changes from this branch.
 EOF
 
   # Stage the generated file so it's included in the push

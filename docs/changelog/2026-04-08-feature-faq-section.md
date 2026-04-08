@@ -7,7 +7,7 @@ owners: [nour-DCS]
 
 ## Context
 
-Branch `dev` — change type: **other**.
+Branch `feature/faq-section` — change type: **feature**.
 
 
 
@@ -20,19 +20,20 @@ Branch `dev` — change type: **other**.
 Files affected in this push:
 
 - `.husky/pre-push`
+- `docs/changelog/2026-04-08-dev.md`
 
 ## Approach
 
 | Field       | Value              |
 |-------------|--------------------|
-| Date        | 2026-04-08 18:38:17       |
-| Branch      | `dev`      |
+| Date        | 2026-04-08 18:40:30       |
+| Branch      | `feature/faq-section`      |
 | Author      | nour-DCS          |
-| Change Type | other     |
+| Change Type | feature     |
 
 ## Test plan
 
-- Verify changes on `dev` before merging to master
+- Verify changes on `feature/faq-section` before merging to master
 - Review affected files listed under Scope
 
 ## Rollback plan
